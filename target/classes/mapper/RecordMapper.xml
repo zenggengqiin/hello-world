@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wms.mapper.RecordMapper">
+
+    <select id="pageR" resultType="com.wms.entity.RecordRes">
+        select a.*,(select u.name from user u where u.id=a.userid)username,b.name goodsname,c.name storagename,d.name goodstypename
+        from record a ,goods b ,storage c ,goodstype d ${ew.customSqlSegment}
+    </select>
+
+
+</mapper>

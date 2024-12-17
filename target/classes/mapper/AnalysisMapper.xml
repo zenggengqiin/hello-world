@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wms.mapper.AnalysisMapper">
+
+    <select id="getsix" resultType="com.wms.entity.Analysis">
+        SELECT goodsid,name, SUM(value) AS value
+        FROM analysis
+        WHERE inandout = 0 and goodsid in (select id from goods where goodstype = #{goodstype})
+        GROUP BY goodsid, name
+        ORDER BY value DESC
+            LIMIT 6
+    </select>
+    <select id="getOut" resultType="com.wms.entity.Analysis">
+        SELECT *
+        FROM analysis
+        WHERE inandout = 0 AND goodsid = #{goodsid} ORDER BY date ASC LIMIT 30
+    </select>
+
+    <select id="getfiveID" resultType="com.wms.entity.Analysis">
+        SELECT goodsid, name, SUM(value) AS value
+        FROM analysis
+        WHERE inandout = 0
+          AND goodsid IN (SELECT id FROM goods WHERE goodstype = #{goodstype})
+        GROUP BY goodsid, name
+        ORDER BY SUM(value) DESC
+            LIMIT 6;
+    </select>
+
+    <select id="getmore" resultType="double">
+        SELECT value FROM analysis
+        WHERE goodsid = #{goodsid} and inandout = 0
+        ORDER BY date DESC
+            LIMIT 8
+    </select>
+    <select id="getdate" resultType="java.lang.String">
+        SELECT date FROM analysis
+        WHERE goodsid = #{goodsid} and inandout = 0
+        ORDER BY date DESC
+            LIMIT 7
+    </select>
+    <select id="getAVG" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT sum(value)
+        FROM analysis where goodsid = #{goodsid} and inandout = 0 and date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ORDER BY date DESC;
+    </select>
+    <select id="getDaySum" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT SUM(value) AS value
+        FROM analysis
+        WHERE inandout = 0
+          AND DATE(date) = CURDATE()
+        GROUP BY inandout;
+    </select>
+    <select id="getDayMax" resultType="com.wms.entity.Analysis">
+        select * from analysis where DATE(date) = CURDATE() and inandout = 0 ORDER BY value DESC LIMIT 1;
+    </select>
+    <select id="getDayMin" resultType="com.wms.entity.Analysis">
+        select * from analysis where DATE(date) = CURDATE() and inandout = 0 ORDER BY value ASC LIMIT 1;
+    </select>
+    <select id="getTop" resultType="com.wms.entity.TopRes">
+        SELECT goodsid, name, SUM(value) AS sum
+        FROM analysis
+        WHERE inandout = 0
+          AND MONTH(date) = MONTH(CURDATE())
+          AND YEAR(date) = YEAR(CURDATE())
+        GROUP BY goodsid, name
+        ORDER BY sum DESC
+            LIMIT 1;
+    </select>
+    <select id="getSum" resultType="com.wms.entity.Analysis">
+        SELECT id, goodsid, name, SUM(value) AS value, date, inandout
+        FROM analysis
+        WHERE inandout = 0
+          AND MONTH(date) = MONTH(CURDATE())
+          AND YEAR(date) = YEAR(CURDATE())
+        GROUP BY id, goodsid, name, DATE(date), inandout
+        ORDER BY date DESC;
+
+    </select>
+    <select id="getTomorrow" resultType="double">
+        SELECT value FROM analysis
+        WHERE goodsid = #{goodsid} and inandout = 0
+        ORDER BY date DESC
+            LIMIT 6
+    </select>
+    <select id="getEstimate" parameterType="java.lang.String" resultType="double">
+        SELECT value FROM analysis
+        WHERE goodsid = #{goodsid} and inandout = 0
+        ORDER BY date DESC
+            LIMIT 14
+    </select>
+
+
+</mapper>
